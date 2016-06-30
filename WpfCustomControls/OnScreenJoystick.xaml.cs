@@ -25,6 +25,7 @@ namespace WpfCustomControls
         public static readonly DependencyProperty DistanceStepProperty =
             DependencyProperty.Register("DistanceStep", typeof(double), typeof(OnScreenJoystick), new PropertyMetadata(1.0));
 
+        /* Unstable - needs work */
         ///// <summary>Indicates whether the joystick knob resets its place after being released</summary>
         //public static readonly DependencyProperty ResetKnobAfterReleaseProperty =
         //    DependencyProperty.Register(nameof(ResetKnobAfterRelease), typeof(bool), typeof(VirtualJoystick), new PropertyMetadata(true));
