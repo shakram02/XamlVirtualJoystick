@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace WpfCustomControls
@@ -62,11 +60,13 @@ namespace WpfCustomControls
             }
         }
 
-        
-        /// <summary>
-        /// This event fires whenever the joystick moves
-        /// </summary>
-        public event EventHandler StickMoved;
+        public delegate void VirtualJoystickEventHandler(object sender, VirtualJoystickEventArgs args);
+
+        /// <summary>This event fires whenever the joystick moves</summary>
+        public event VirtualJoystickEventHandler Moved;
+
+        /// <summary>This event fires after the joystick is released angle and distance will always be 0</summary>
+        public event VirtualJoystickEventHandler Released;
 
         private Point _startPos;
         private double _prevAngle, _prevDistance;
@@ -117,12 +117,11 @@ namespace WpfCustomControls
                 knobPosition.X = p.X;
                 knobPosition.Y = p.Y;
 
-
-                if (StickMoved == null ||
+                if (Moved == null ||
                     (!(Math.Abs(_prevAngle - angle) > AngleStep) && !(Math.Abs(_prevDistance - distance) > DistanceStep)))
                     return;
 
-                StickMoved(this, new EventArgs());
+                Moved?.Invoke(this, new VirtualJoystickEventArgs { Angle = Angle, Distance = Distance });
                 _prevAngle = Angle;
                 _prevDistance = Distance;
             }
@@ -137,6 +136,7 @@ namespace WpfCustomControls
         private void centerKnob_Completed(object sender, EventArgs e)
         {
             Angle = Distance = _prevAngle = _prevDistance = 0;
+            Released?.Invoke(this, new VirtualJoystickEventArgs { Angle = 0, Distance = 0 });
         }
     }
 }
