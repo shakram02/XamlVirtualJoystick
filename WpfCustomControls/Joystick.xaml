@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfCustomControls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Background="Transparent">
+    <Grid Background="Transparent" >
         <Canvas x:Name="Base" Margin="0" Width="340" Height="340">
             <Ellipse HorizontalAlignment="Left" Height="340" VerticalAlignment="Top" Width="340">
                 <Ellipse.Fill>

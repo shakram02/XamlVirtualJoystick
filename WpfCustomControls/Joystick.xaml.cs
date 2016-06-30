@@ -8,37 +8,42 @@ namespace WpfCustomControls
 {
     /// <summary>Interaction logic for Joystick.xaml</summary>
     public partial class VirtualJoystick : UserControl
-    { /// <summary>Current angle (in degrees)</summary>
+    {
+        /// <summary>Current angle in degrees from 0 to 360</summary>
         public static readonly DependencyProperty AngleProperty =
             DependencyProperty.Register("Angle", typeof(double), typeof(VirtualJoystick), null);
 
-        /// <summary>Current distanse (from 0 to 100)</summary>
+        /// <summary>Current distance (or "power"), from 0 to 100</summary>
         public static readonly DependencyProperty DistanceProperty =
             DependencyProperty.Register("Distance", typeof(double), typeof(VirtualJoystick), null);
 
-        /// <summary>Delta angle to raise event StickMove</summary>
+        /// <summary>How often should be raised StickMove event in degrees</summary>
         public static readonly DependencyProperty AngleStepProperty =
             DependencyProperty.Register("AngleStep", typeof(double), typeof(VirtualJoystick), new PropertyMetadata(1.0));
 
-        /// <summary>Delta distance to raise event StickMove</summary>
+        /// <summary>How often should be raised StickMove event in distance units</summary>
         public static readonly DependencyProperty DistanceStepProperty =
             DependencyProperty.Register("DistanceStep", typeof(double), typeof(VirtualJoystick), new PropertyMetadata(1.0));
 
-        /// <summary>Current angle (in degrees)</summary>
+        ///// <summary>Indicates whether the joystick knob resets its place after being released</summary>
+        //public static readonly DependencyProperty ResetKnobAfterReleaseProperty =
+        //    DependencyProperty.Register(nameof(ResetKnobAfterRelease), typeof(bool), typeof(VirtualJoystick), new PropertyMetadata(true));
+
+        /// <summary>Current angle in degrees from 0 to 360</summary>
         public double Angle
         {
             get { return Convert.ToDouble(GetValue(AngleProperty)); }
             private set { SetValue(AngleProperty, value); }
         }
 
-        /// <summary>Current distanse (from 0 to 100)</summary>
+        /// <summary>current distance (or "power"), from 0 to 100</summary>
         public double Distance
         {
             get { return Convert.ToDouble(GetValue(DistanceProperty)); }
             private set { SetValue(DistanceProperty, value); }
         }
 
-        /// <summary>Current angle (in degrees)</summary>
+        /// <summary>How often should be raised StickMove event in degrees</summary>
         public double AngleStep
         {
             get { return Convert.ToDouble(GetValue(AngleStepProperty)); }
@@ -49,7 +54,7 @@ namespace WpfCustomControls
             }
         }
 
-        /// <summary>Current angle (in degrees)</summary>
+        /// <summary>How often should be raised StickMove event in distance units</summary>
         public double DistanceStep
         {
             get { return Convert.ToDouble(GetValue(DistanceStepProperty)); }
@@ -60,13 +65,30 @@ namespace WpfCustomControls
             }
         }
 
-        public delegate void VirtualJoystickEventHandler(object sender, VirtualJoystickEventArgs args);
+        /// <summary>Indicates whether the joystick knob resets its place after being released</summary>
+        //public bool ResetKnobAfterRelease
+        //{
+        //    get { return Convert.ToBoolean(GetValue(ResetKnobAfterReleaseProperty)); }
+        //    set { SetValue(ResetKnobAfterReleaseProperty, value); }
+        //}
+
+        /// <summary>Delegate holding data for joystick state change</summary>
+        /// <param name="sender">The object that fired the event</param>
+        /// <param name="args">Holds new values for angle and distance</param>
+        public delegate void VirtualJoystickEventHandler(VirtualJoystick sender, VirtualJoystickEventArgs args);
+
+        /// <summary>Delegate for joystick events that hold no data</summary>
+        /// <param name="sender">The object that fired the event</param>
+        public delegate void EmptyJoystickEventHandler(VirtualJoystick sender);
 
         /// <summary>This event fires whenever the joystick moves</summary>
         public event VirtualJoystickEventHandler Moved;
 
-        /// <summary>This event fires after the joystick is released angle and distance will always be 0</summary>
-        public event VirtualJoystickEventHandler Released;
+        /// <summary>This event fires once the joystick is released and its position is reset</summary>
+        public event EmptyJoystickEventHandler Released;
+
+        /// <summary>This event fires once the joystick is captured</summary>
+        public event EmptyJoystickEventHandler Captured;
 
         private Point _startPos;
         private double _prevAngle, _prevDistance;
@@ -88,7 +110,9 @@ namespace WpfCustomControls
             _startPos = e.GetPosition(Base);
             _prevAngle = _prevDistance = 0;
 
+            Captured?.Invoke(this);
             Knob.CaptureMouse();
+            
             centerKnob.Stop();
         }
 
@@ -136,7 +160,7 @@ namespace WpfCustomControls
         private void centerKnob_Completed(object sender, EventArgs e)
         {
             Angle = Distance = _prevAngle = _prevDistance = 0;
-            Released?.Invoke(this, new VirtualJoystickEventArgs { Angle = 0, Distance = 0 });
+            Released?.Invoke(this);
         }
     }
 }
