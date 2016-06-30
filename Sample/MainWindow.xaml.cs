@@ -9,8 +9,8 @@ namespace Sample
         public MainWindow()
         {
             InitializeComponent();
-            virtualJoystick.Moved += VirtualJoystick_Moved;
-            virtualJoystick.ResetKnobAfterRelease = false;
+            onScreenJoystick.Moved += VirtualJoystick_Moved;
+            //virtualJoystick.ResetKnobAfterRelease = false;
         }
 
         private void VirtualJoystick_Moved(object sender, WpfCustomControls.VirtualJoystickEventArgs args)

@@ -7,23 +7,23 @@ using System.Windows.Media.Animation;
 namespace WpfCustomControls
 {
     /// <summary>Interaction logic for Joystick.xaml</summary>
-    public partial class VirtualJoystick : UserControl
+    public partial class OnScreenJoystick : UserControl
     {
         /// <summary>Current angle in degrees from 0 to 360</summary>
         public static readonly DependencyProperty AngleProperty =
-            DependencyProperty.Register("Angle", typeof(double), typeof(VirtualJoystick), null);
+            DependencyProperty.Register("Angle", typeof(double), typeof(OnScreenJoystick), null);
 
         /// <summary>Current distance (or "power"), from 0 to 100</summary>
         public static readonly DependencyProperty DistanceProperty =
-            DependencyProperty.Register("Distance", typeof(double), typeof(VirtualJoystick), null);
+            DependencyProperty.Register("Distance", typeof(double), typeof(OnScreenJoystick), null);
 
         /// <summary>How often should be raised StickMove event in degrees</summary>
         public static readonly DependencyProperty AngleStepProperty =
-            DependencyProperty.Register("AngleStep", typeof(double), typeof(VirtualJoystick), new PropertyMetadata(1.0));
+            DependencyProperty.Register("AngleStep", typeof(double), typeof(OnScreenJoystick), new PropertyMetadata(1.0));
 
         /// <summary>How often should be raised StickMove event in distance units</summary>
         public static readonly DependencyProperty DistanceStepProperty =
-            DependencyProperty.Register("DistanceStep", typeof(double), typeof(VirtualJoystick), new PropertyMetadata(1.0));
+            DependencyProperty.Register("DistanceStep", typeof(double), typeof(OnScreenJoystick), new PropertyMetadata(1.0));
 
         ///// <summary>Indicates whether the joystick knob resets its place after being released</summary>
         //public static readonly DependencyProperty ResetKnobAfterReleaseProperty =
@@ -75,14 +75,14 @@ namespace WpfCustomControls
         /// <summary>Delegate holding data for joystick state change</summary>
         /// <param name="sender">The object that fired the event</param>
         /// <param name="args">Holds new values for angle and distance</param>
-        public delegate void VirtualJoystickEventHandler(VirtualJoystick sender, VirtualJoystickEventArgs args);
+        public delegate void OnScreenJoystickEventHandler(OnScreenJoystick sender, VirtualJoystickEventArgs args);
 
         /// <summary>Delegate for joystick events that hold no data</summary>
         /// <param name="sender">The object that fired the event</param>
-        public delegate void EmptyJoystickEventHandler(VirtualJoystick sender);
+        public delegate void EmptyJoystickEventHandler(OnScreenJoystick sender);
 
         /// <summary>This event fires whenever the joystick moves</summary>
-        public event VirtualJoystickEventHandler Moved;
+        public event OnScreenJoystickEventHandler Moved;
 
         /// <summary>This event fires once the joystick is released and its position is reset</summary>
         public event EmptyJoystickEventHandler Released;
@@ -94,7 +94,7 @@ namespace WpfCustomControls
         private double _prevAngle, _prevDistance;
         private readonly Storyboard centerKnob;
 
-        public VirtualJoystick()
+        public OnScreenJoystick()
         {
             InitializeComponent();
 
@@ -112,7 +112,7 @@ namespace WpfCustomControls
 
             Captured?.Invoke(this);
             Knob.CaptureMouse();
-            
+
             centerKnob.Stop();
         }
 
@@ -121,9 +121,10 @@ namespace WpfCustomControls
             if (!Knob.IsMouseCaptured) return;
 
             Point newPos = e.GetPosition(Base);
-            Point p = new Point(newPos.X - _startPos.X, newPos.Y - _startPos.Y);
 
-            double angle = Math.Atan2(p.Y, p.X) * 180 / Math.PI;
+            Point deltaPos = new Point(newPos.X - _startPos.X, newPos.Y - _startPos.Y);
+
+            double angle = Math.Atan2(deltaPos.Y, deltaPos.X) * 180 / Math.PI;
             if (angle > 0)
                 angle += 90;
             else
@@ -132,14 +133,14 @@ namespace WpfCustomControls
                 if (angle >= 360) angle -= 360;
             }
 
-            double distance = Math.Round(Math.Sqrt(p.X * p.X + p.Y * p.Y) / 135 * 100);
+            double distance = Math.Round(Math.Sqrt(deltaPos.X * deltaPos.X + deltaPos.Y * deltaPos.Y) / 135 * 100);
             if (distance <= 100)
             {
                 Angle = angle;
                 Distance = distance;
 
-                knobPosition.X = p.X;
-                knobPosition.Y = p.Y;
+                knobPosition.X = deltaPos.X;
+                knobPosition.Y = deltaPos.Y;
 
                 if (Moved == null ||
                     (!(Math.Abs(_prevAngle - angle) > AngleStep) && !(Math.Abs(_prevDistance - distance) > DistanceStep)))

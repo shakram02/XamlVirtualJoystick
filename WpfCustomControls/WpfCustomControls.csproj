@@ -51,14 +51,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="VirtualJoystickEventArgs.cs" />
-    <Page Include="Joystick.xaml">
+    <Page Include="OnScreenJoystick.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Joystick.xaml.cs">
-      <DependentUpon>Joystick.xaml</DependentUpon>
+    <Compile Include="OnScreenJoystick.xaml.cs">
+      <DependentUpon>OnScreenJoystick.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
